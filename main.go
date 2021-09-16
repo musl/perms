@@ -12,7 +12,7 @@ import (
 	_ "embed"
 )
 
-//go:embed words_alpha.txt
+//go:embed wordlists/default_english.txt
 var defaultDictionaryString string
 var defaultDictionary = map[string]int{}
 
@@ -20,7 +20,6 @@ func init() {
 	entries := strings.Split(defaultDictionaryString, "\n")
 	for _, entry := range entries {
 		defaultDictionary[entry]++
-		log.Println(entry)
 	}
 }
 
