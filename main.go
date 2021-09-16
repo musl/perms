@@ -8,7 +8,21 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	_ "embed"
 )
+
+//go:embed words_alpha.txt
+var defaultDictionaryString string
+var defaultDictionary = map[string]int{}
+
+func init() {
+	entries := strings.Split(defaultDictionaryString, "\n")
+	for _, entry := range entries {
+		defaultDictionary[entry]++
+		log.Println(entry)
+	}
+}
 
 func loadDictionary(path string) (map[string]int, error) {
 	f, err := os.Open(path)
@@ -83,7 +97,7 @@ func main() {
 
 	f := Flags{}
 
-	flag.StringVar(&f.DictionaryPath, "d", "", "Path to dictionary file (required)")
+	flag.StringVar(&f.DictionaryPath, "d", "", "Path to dictionary file (optional, defaults to embedded english dictionary)")
 	flag.StringVar(&f.Word, "w", "", "Word to process (required)")
 	flag.Parse()
 
@@ -93,14 +107,20 @@ func main() {
 	}
 
 	f.Word = strings.TrimSpace(f.Word)
-	if f.DictionaryPath == "" || f.Word == "" {
+	if f.Word == "" {
 		flag.Usage()
 		return
 	}
 
-	dictionary, err := loadDictionary(f.DictionaryPath)
-	if err != nil {
-		log.Fatal(err)
+	dictionary := defaultDictionary
+
+	if f.DictionaryPath != "" {
+		loadedDictionary, err := loadDictionary(f.DictionaryPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		dictionary = loadedDictionary
 	}
 
 	list := permutations(f.Word, dictionary)
