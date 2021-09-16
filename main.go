@@ -13,11 +13,12 @@ import (
 )
 
 //go:embed wordlists/default_english.txt
-var defaultDictionaryString string
+var defaultDictionaryEmbed string
+
 var defaultDictionary = map[string]int{}
 
 func init() {
-	entries := strings.Split(defaultDictionaryString, "\n")
+	entries := strings.Split(defaultDictionaryEmbed, "\n")
 	for _, entry := range entries {
 		defaultDictionary[entry]++
 	}
@@ -40,7 +41,7 @@ func loadDictionary(path string) (map[string]int, error) {
 	return wordMap, nil
 }
 
-func permutations(word string, dictionary map[string]int) []string {
+func findSingleWordAnagrams(word string, dictionary map[string]int) []string {
 	if len(word) == 0 {
 		return []string{word}
 	}
@@ -122,7 +123,7 @@ func main() {
 		dictionary = loadedDictionary
 	}
 
-	list := permutations(f.Word, dictionary)
+	list := findSingleWordAnagrams(f.Word, dictionary)
 	for _, word := range list {
 		fmt.Println(word)
 	}
